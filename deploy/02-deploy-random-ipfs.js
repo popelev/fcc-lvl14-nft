@@ -9,6 +9,12 @@ const imagesLocation = "./images/randomNft"
 
 const UPLOAD_TO_PINATA = process.env.UPLOAD_TO_PINATA
 
+let tokensUris = [
+    "ipfs://QmUXGaHr4qqTdqUR1QvAPv9HRvRBufx48daeB2SqBU4rnD",
+    "ipfs://QmcJCxPTuJQEkPivv12cPPBUEcWJ15VRy3JMe7oqCekr4f",
+    "ipfs://QmbcwpoQwgE9idFpXon2ZbypwCG4UCRYWQscSByKfwXqtu",
+]
+
 const metadataTemplate = {
     name: "",
     desctription: "",
@@ -30,11 +36,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     let subscriptionId = 0
 
     // IPFS images
-    let tokensUris = [
-        "ipfs://QmUXGaHr4qqTdqUR1QvAPv9HRvRBufx48daeB2SqBU4rnD",
-        "ipfs://QmcJCxPTuJQEkPivv12cPPBUEcWJ15VRy3JMe7oqCekr4f",
-        "ipfs://QmbcwpoQwgE9idFpXon2ZbypwCG4UCRYWQscSByKfwXqtu",
-    ]
+
     if (UPLOAD_TO_PINATA == "true") {
         tokensUris = await handleTokenUris()
     }
