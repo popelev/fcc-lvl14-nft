@@ -20,19 +20,6 @@ contract BasicNft is ERC721 {
         return s_tokenCounter;
     }
 
-    /*
-    function NFT_safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) public virtual {
-        super.safeTransferFrom(from, to, tokenId, "");
-    }
-
-    function NFT_ownerOf(uint256 tokenId) public view virtual returns (address) {
-        return super.ownerOf(tokenId);
-    }*/
-
     function tokenURI(
         uint256 /*tokenId*/
     ) public view override returns (string memory) {

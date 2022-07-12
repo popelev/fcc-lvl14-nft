@@ -6,16 +6,13 @@ const { verify } = require("../utils/verify")
 module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()
-    const chainId = network.config.chainId
 
-    log("----------------------------------------------------")
     if (developmentChains.includes(network.name)) {
     } else {
     }
     const waitBlockConfirmations = developmentChains.includes(network.name)
         ? 1
         : VERIFICATION_BLOCK_CONFIRMATIONS
-    log("----------------------------------------------------")
 
     const deployArgs = []
     log(" " + deployArgs)
@@ -37,4 +34,4 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log("----------------------------------------------------------")
 }
 
-module.exports.tags = ["all", "baseNft"]
+module.exports.tags = ["all", "basicNft"]
