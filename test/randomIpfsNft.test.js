@@ -1,6 +1,7 @@
 const { expect, assert } = require("chai")
 const { network, deployments, ethers, getNamedAccounts, getChainId } = require("hardhat")
 const { developmentChains, networkConfig } = require("../helper-hardhat-config")
+const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs")
 
 !developmentChains.includes(network.name)
     ? describe.skip //("features", function () {})
@@ -30,8 +31,28 @@ const { developmentChains, networkConfig } = require("../helper-hardhat-config")
               })
           })
 
-          xdescribe("public", async function () {
-              it("requestNft", async function () {})
+          describe("requestNft", async function () {
+              it("requestNft failed if not enough ETH", async function () {
+                  await expect(randomIpfsNft.requestNft({ value: 1 })).to.be.revertedWith(
+                      "RandomIpfsNft__NeedMoreETHSent"
+                  )
+              })
+              it("requestNft and emit NftRequested", async function () {
+                  const mintFee = await randomIpfsNft.getMintFee()
+                  await expect(randomIpfsNft.requestNft({ value: mintFee }))
+                      .to.emit(randomIpfsNft, "NftRequested")
+                      .withArgs(anyValue, deployerAddress)
+              })
+          })
+
+          xdescribe("random", async function () {
+              it("requestNft and emit NftMinted", async function () {
+                  const mintFee = await randomIpfsNft.getMintFee()
+                  await expect(randomIpfsNft.requestNft({ value: mintFee })).to.emit(
+                      randomIpfsNft,
+                      "NftMinted"
+                  )
+              })
           })
 
           describe("withdraw", async function () {
@@ -47,6 +68,32 @@ const { developmentChains, networkConfig } = require("../helper-hardhat-config")
                   await expect(randomIpfsNft.withdraw(emptyContract.address)).to.be.revertedWith(
                       "RandomIpfsNft__TransferFaild"
                   )
+              })
+          })
+
+          describe("getters", async function () {
+              it("getBreedFromModdedRng", async function () {
+                  const getter = await randomIpfsNft.getBreedFromModdedRng(1)
+                  expect(getter).to.be.least(0)
+              })
+              it("getBreedFromModdedRng failed if moddedRng > max chance", async function () {
+                  const maxChance = await randomIpfsNft.getMaxChance()
+                  const moddedRng = maxChance + 1
+                  await expect(randomIpfsNft.getBreedFromModdedRng(moddedRng)).to.be.revertedWith(
+                      "RandomIpfsNft__RangeOutOfBounds"
+                  )
+              })
+              it("getGasLane", async function () {
+                  const getter = await randomIpfsNft.getGasLane()
+                  assert(getter.toString() !== "")
+              })
+              it("getDogTokenUris", async function () {
+                  const getter = await randomIpfsNft.getDogTokenUris(0)
+                  expect(getter).to.have.lengthOf.above(0)
+              })
+              xit("getTokenCounter", async function () {
+                  const getter = await randomIpfsNft.getTokenCounter()
+                  expect(getter).to.be.least(0)
               })
           })
       })
