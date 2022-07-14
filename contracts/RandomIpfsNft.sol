@@ -22,11 +22,11 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage, Ownable {
 
     /* Chainlink VRF varibles */
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
-    uint64 private immutable i_subscriptionId;
     bytes32 private immutable i_gasLane;
+    uint64 private immutable i_subscriptionId;
     uint32 private immutable i_callbackGasLimit;
-    uint16 private constant REQUEST_CONFIRMATION = 3;
     uint32 private constant NUM_WORDS = 1;
+    uint16 private constant REQUEST_CONFIRMATION = 3;
 
     /* VRF Helper */
     mapping(uint256 => address) public s_requestIdSender;
@@ -41,7 +41,7 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage, Ownable {
     event NftRequested(uint256 indexed requestId, address requester);
     event NftMinted(Breed dogBreed, address minter);
 
-    /* Functions */
+    /* CONSTRUCTOR */
     constructor(
         address vrfCoordinator,
         uint64 subscriptionId,
@@ -58,6 +58,7 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage, Ownable {
         i_mintFee = mintFee;
     }
 
+    /* PUBLIC FUNCTIONS */
     function requestNft() public payable EnoughETH(i_mintFee) returns (uint256 requestId) {
         requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
@@ -70,6 +71,17 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage, Ownable {
         emit NftRequested(requestId, msg.sender);
     }
 
+    function withdraw(address payable _address) public onlyOwner returns (bool) {
+        uint256 amount = address(this).balance;
+        (bool success, ) = _address.call{value: amount}("");
+        if (success) {
+            return success;
+        } else {
+            revert RandomIpfsNft__TransferFaild();
+        }
+    }
+
+    /* INTERNAL */
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal override {
         address dogOwner = s_requestIdSender[requestId];
         uint256 newTokenId = s_tokenCounter;
@@ -81,14 +93,7 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage, Ownable {
         emit NftMinted(dogBreed, dogOwner);
     }
 
-    function withdraw() public onlyOwner {
-        uint256 amount = address(this).balance;
-        (bool success, ) = payable(msg.sender).call{value: amount}("");
-        if (!success) {
-            revert RandomIpfsNft__TransferFaild();
-        }
-    }
-
+    /* GETTERS */
     function getBreedFromModdedRng(uint256 moddedRng) public pure returns (Breed) {
         uint256 cumulativeSum = 0;
         uint256[3] memory chanceArray = getChanceArray();
@@ -106,6 +111,10 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage, Ownable {
         return [10, 30, MAX_CHANCE_VALUE];
     }
 
+    function getGasLane() public view returns (bytes32) {
+        return i_gasLane;
+    }
+
     function getMintFee() public view returns (uint256) {
         return i_mintFee;
     }
@@ -114,10 +123,15 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage, Ownable {
         return s_dogTokenUris[index];
     }
 
+    function getVrfCoordinatorAddress() public view returns (address) {
+        return address(i_vrfCoordinator);
+    }
+
     function getTokenCounter() public view returns (uint256) {
         return s_tokenCounter;
     }
 
+    /* MODIFIERS */
     modifier EnoughETH(uint256 limit) {
         if (msg.value < limit) {
             revert RandomIpfsNft__NeedMoreETHSent();

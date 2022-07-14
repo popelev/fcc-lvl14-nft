@@ -22,6 +22,15 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         })
         log("VRFCoordinatorV2Mock deployed!")
         log("----------------------------------------------------------")
+
+        await deploy("EmptyContract", {
+            contract: "EmptyContract",
+            from: deployer,
+            log: true,
+            args: "",
+        })
+        log("EmptyContract deployed!")
+        log("----------------------------------------------------------")
     }
 }
 
