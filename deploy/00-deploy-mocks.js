@@ -3,6 +3,8 @@ const { developmentChains } = require("../helper-hardhat-config")
 
 const BASE_FEE = ethers.utils.parseEther("0.25") // 0.25 LINK per request
 const GAS_PRICE_LINK = 1e9
+const DECIMALS = "18"
+const INITIAL_PRICE = ethers.utils.parseUnits("2000", "ether")
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
@@ -21,6 +23,15 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
             args: VRF_deployArgs,
         })
         log("VRFCoordinatorV2Mock deployed!")
+        log("----------------------------------------------------------")
+
+        await deploy("MockV3Aggregator", {
+            contract: "MockV3Aggregator",
+            from: deployer,
+            log: true,
+            args: [DECIMALS, INITIAL_PRICE],
+        })
+        log("MockV3Aggregator deployed!")
         log("----------------------------------------------------------")
 
         await deploy("EmptyContract", {

@@ -39,8 +39,8 @@ const { developmentChains, networkConfig } = require("../helper-hardhat-config")
                   assert.equal(tokenCounterAfter.toNumber(), 1)
               })
               it("deployer is owner of nft", async function () {
-                  const tokenCounter = await basicNft.getTokenCounter()
                   await basicNft.mintNft()
+                  const tokenCounter = await basicNft.getTokenCounter()
                   const owner = await basicNft.ownerOf(tokenCounter)
                   assert.equal(owner, deployerAddress)
               })
@@ -56,8 +56,8 @@ const { developmentChains, networkConfig } = require("../helper-hardhat-config")
 
           describe("transfer", async function () {
               it("nft transfered from owner to user1 by owner", async function () {
-                  const tokenCounter = await basicNft.getTokenCounter()
                   await basicNft.mintNft()
+                  const tokenCounter = await basicNft.getTokenCounter()
                   let owner = await basicNft.ownerOf(tokenCounter)
                   assert.equal(owner, deployerAddress)
 
@@ -72,8 +72,8 @@ const { developmentChains, networkConfig } = require("../helper-hardhat-config")
               })
 
               it("nft transfered from owner to user1 by user1 after owner approve", async function () {
-                  const tokenCounter = await basicNft.getTokenCounter()
                   await basicNft.mintNft()
+                  const tokenCounter = await basicNft.getTokenCounter()
                   let owner = await basicNft.ownerOf(tokenCounter)
                   assert.equal(owner, deployerAddress)
 
@@ -88,8 +88,8 @@ const { developmentChains, networkConfig } = require("../helper-hardhat-config")
                   assert.equal(owner, user1Address)
               })
               it("not allowed to transfer nft from owner to user1 by user1 if owner does not approve", async function () {
-                  const tokenCounter = await basicNft.getTokenCounter()
                   await basicNft.mintNft()
+                  const tokenCounter = await basicNft.getTokenCounter()
                   let owner = await basicNft.ownerOf(tokenCounter)
                   assert.equal(owner, deployerAddress)
 
