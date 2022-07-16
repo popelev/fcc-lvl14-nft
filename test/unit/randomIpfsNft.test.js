@@ -1,6 +1,6 @@
 const { expect, assert } = require("chai")
 const { network, deployments, ethers, getNamedAccounts, getChainId } = require("hardhat")
-const { developmentChains, networkConfig } = require("../helper-hardhat-config")
+const { developmentChains, networkConfig } = require("../../helper-hardhat-config")
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs")
 
 !developmentChains.includes(network.name)
@@ -35,15 +35,15 @@ const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs")
               })
           })
 
-          describe("requestNft", async function () {
-              it("requestNft failed if not enough ETH", async function () {
-                  await expect(randomIpfsNft.requestNft({ value: 1 })).to.be.revertedWith(
+          describe("mintNft", async function () {
+              it("mintNft failed if not enough ETH", async function () {
+                  await expect(randomIpfsNft.mintNft({ value: 1 })).to.be.revertedWith(
                       "RandomIpfsNft__NeedMoreETHSent"
                   )
               })
-              it("requestNft and emit NftRequested", async function () {
+              it("mintNft and emit NftRequested", async function () {
                   const mintFee = await randomIpfsNft.getMintFee()
-                  await expect(randomIpfsNft.requestNft({ value: mintFee }))
+                  await expect(randomIpfsNft.mintNft({ value: mintFee }))
                       .to.emit(randomIpfsNft, "NftRequested")
                       .withArgs(anyValue, deployerAddress)
               })
@@ -81,8 +81,8 @@ const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs")
                   const getter = await randomIpfsNft.getGasLane()
                   assert(getter.toString() !== "")
               })
-              it("getDogTokenUris", async function () {
-                  const getter = await randomIpfsNft.getDogTokenUris(0)
+              it("tokenURI", async function () {
+                  const getter = await randomIpfsNft.tokenURI(0)
                   assert(getter.includes("ipfs://"))
               })
               xit("getTokenCounter", async function () {
@@ -100,9 +100,9 @@ const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs")
                       vrgCoordinatorV2Mock.fulfillRandomWords(1, randomIpfsNft.address)
                   ).to.be.revertedWith("nonexistent request")
               })
-              xit("requestNft and emit NftMinted", async function () {
+              xit("mintNft and emit NftMinted", async function () {
                   const mintFee = await randomIpfsNft.getMintFee()
-                  await expect(randomIpfsNft.requestNft({ value: mintFee })).to.emit(
+                  await expect(randomIpfsNft.mintNft({ value: mintFee })).to.emit(
                       randomIpfsNft,
                       "NftMinted"
                   )

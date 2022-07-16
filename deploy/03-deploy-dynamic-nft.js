@@ -2,16 +2,17 @@
 const { network, ethers } = require("hardhat")
 const { networkConfig, developmentChains } = require("../helper-hardhat-config")
 const { verify } = require("../utils/verify")
-
-const PRICE_FEED_ADDRESS = process.env.PRICE_FEED_ADDRESS
+const fs = require("fs")
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
+    /* Varibles */
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()
 
     const chainId = network.config.chainId
     let ethUsdPriceFeedAddress
 
+    /* Select parameters in different enviriment */
     if (developmentChains.includes(network.name)) {
         log("Read MockV3Aggregator from local testnet ")
         const mockV3Aggregator = await ethers.getContract("MockV3Aggregator")
@@ -19,12 +20,17 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     } else {
         ethUsdPriceFeedAddress = networkConfig[chainId]["ethUsdPriceFeed"]
     }
+
     const waitBlockConfirmations = developmentChains.includes(network.name)
         ? 1
         : VERIFICATION_BLOCK_CONFIRMATIONS
 
-    const deployArgs = [PRICE_FEED_ADDRESS, "", ""]
-    log(" " + deployArgs)
+    log("Read images from files ")
+    const lowSVG = fs.readFileSync("./images/dynamicNft/frown.svg", { encoding: "utf8" })
+    const highSVG = fs.readFileSync("./images/dynamicNft/happy.svg", { encoding: "utf8" })
+
+    const deployArgs = [ethUsdPriceFeedAddress, lowSVG, highSVG]
+
     /* Deply contract */
     log("Deploy  contract")
     const dynamicSvgNft = await deploy("DynamicSvgNft", {
@@ -43,4 +49,4 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     log("----------------------------------------------------------")
 }
 
-module.exports.tags = ["all", "dynamicSvgNft"]
+module.exports.tags = ["all", "dynamicSvgNft", "main"]

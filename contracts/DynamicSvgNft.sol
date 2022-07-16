@@ -31,8 +31,8 @@ contract DynamicSvgNft is ERC721 {
     }
 
     function mintNft(int256 highValue) public {
-        s_tokenIdToHighValue[s_tokenCounter] = highValue;
         s_tokenCounter += 1;
+        s_tokenIdToHighValue[s_tokenCounter] = highValue;
         _safeMint(msg.sender, s_tokenCounter);
 
         emit NftMinted(s_tokenCounter, highValue);
@@ -43,24 +43,24 @@ contract DynamicSvgNft is ERC721 {
         return string(abi.encodePacked(BASE64_ENCODED_SVG_PREFIX, svgBase64Encoded));
     }
 
-    function _baseURI(string memory svg) internal pure returns (string memory) {
-        return JSON_PREFIX;
-    }
-
-    function tokenURI(uint256 tokenId) public view override returns (string memory) {
-        require(_exists(tokenId), "URI Quary for nonexistent token");
-        // string memory imageURI = "Hi";
-
-        (, int256 price, , , ) = i_priceFeed.latestRoundData();
+    function SelectUri(uint256 tokenId) public view returns (string memory) {
+        int256 price = getLastPrice();
         string memory imageURI = i_lowImageURI;
         if (price >= s_tokenIdToHighValue[tokenId]) {
             imageURI = i_highImageURI;
         }
+        return imageURI;
+    }
+
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        require(_exists(tokenId), "URI Quary for nonexistent token");
+
+        string memory imageURI = SelectUri(tokenId);
 
         return
             string(
                 abi.encodePacked(
-                    _baseURI(),
+                    getJsonPrefix(),
                     Base64.encode(
                         bytes(
                             abi.encodePacked(
@@ -77,7 +77,28 @@ contract DynamicSvgNft is ERC721 {
             );
     }
 
+    function getLastPrice() public view returns (int256) {
+        (, int256 price, , , ) = i_priceFeed.latestRoundData();
+        return price;
+    }
+
     function getTokenCounter() public view returns (uint256) {
         return s_tokenCounter;
+    }
+
+    function getLowImageURI() public view returns (string memory) {
+        return i_lowImageURI;
+    }
+
+    function getHighImageURI() public view returns (string memory) {
+        return i_highImageURI;
+    }
+
+    function getSvgPrefix() public pure returns (string memory) {
+        return BASE64_ENCODED_SVG_PREFIX;
+    }
+
+    function getJsonPrefix() public pure returns (string memory) {
+        return JSON_PREFIX;
     }
 }

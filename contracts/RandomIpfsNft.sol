@@ -59,7 +59,7 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage, Ownable {
     }
 
     /* PUBLIC FUNCTIONS */
-    function requestNft() public payable EnoughETH(i_mintFee) returns (uint256 requestId) {
+    function mintNft() public payable EnoughETH(i_mintFee) returns (uint256 requestId) {
         requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
@@ -119,7 +119,7 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage, Ownable {
         return i_mintFee;
     }
 
-    function getDogTokenUris(uint256 index) public view returns (string memory) {
+    function tokenURI(uint256 index) public view override returns (string memory) {
         return s_dogTokenUris[index];
     }
 
