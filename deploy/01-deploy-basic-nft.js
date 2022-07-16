@@ -7,13 +7,6 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()
 
-    if (developmentChains.includes(network.name)) {
-    } else {
-    }
-    const waitBlockConfirmations = developmentChains.includes(network.name)
-        ? 1
-        : VERIFICATION_BLOCK_CONFIRMATIONS
-
     const deployArgs = []
     log(" " + deployArgs)
     /* Deply contract */
@@ -22,16 +15,16 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         from: deployer,
         args: deployArgs,
         log: true,
-        waitConformations: waitBlockConfirmations,
+        waitConformations: network.config.blockConfirmations || 1,
     })
 
     /* Verify contract */
     log("Contract deployed!")
 
     if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
-        await verify(baseNft.address, deployArgs)
+        await verify(basicNft.address, deployArgs)
     }
     log("----------------------------------------------------------")
 }
 
-module.exports.tags = ["all", "basicNft"]
+module.exports.tags = ["all", "basicNft", "main"]

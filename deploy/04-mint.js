@@ -9,12 +9,20 @@ module.exports = async ({ getNamedAccounts }) => {
     const basicMintTx = await basicNft.mintNft()
     await basicMintTx.wait(1)
     const basicUri = await basicNft.tokenURI(1)
-    console.log("Basic NFT index 0 has token uri: " + basicUri)
+    console.log("Basic NFT index 1 has token uri: " + basicUri)
+
+    //dynamic
+    const highValue = ethers.utils.parseEther("4000")
+    const dynamicNft = await ethers.getContract("DynamicSvgNft", deployer)
+    const dynamicMintTx = await dynamicNft.mintNft(highValue.toString())
+    await dynamicMintTx.wait(1)
+    const dynamicUri = await dynamicNft.tokenURI(1)
+    console.log("Dynamic Svg NFT index 1 has token uri: " + dynamicUri)
 
     //random
     const randomIpfsNft = await ethers.getContract("RandomIpfsNft", deployer)
     const randomMintFee = await randomIpfsNft.getMintFee()
-    await new Promise(async (resolve, reject) => {
+    await new Promise(async (resolve) => {
         setTimeout(resolve, 300000) //5min
         randomIpfsNft.once("NftMinted", async function () {
             resolve()
@@ -28,13 +36,6 @@ module.exports = async ({ getNamedAccounts }) => {
         }
     })
     const randomUri = await randomIpfsNft.tokenURI(1)
-    console.log("Random NFT index 0 has token uri: " + randomUri)
-
-    //dynamic
-    const highValue = ethers.utils.parseEther("4000")
-    const dynamicNft = await ethers.getContract("DynamicSvgNft", deployer)
-    const dynamicMintTx = await dynamicNft.mintNft(highValue.toString())
-    await dynamicMintTx.wait(1)
-    const dynamicUri = await dynamicNft.tokenURI(1)
-    console.log("Dynamic Svg NFT index 0 has token uri: " + dynamicUri)
+    console.log("Random NFT index 1 has token uri: " + randomUri)
 }
+module.exports.tags = ["all", "mint"]

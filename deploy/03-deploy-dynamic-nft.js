@@ -21,10 +21,6 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         ethUsdPriceFeedAddress = networkConfig[chainId]["ethUsdPriceFeed"]
     }
 
-    const waitBlockConfirmations = developmentChains.includes(network.name)
-        ? 1
-        : VERIFICATION_BLOCK_CONFIRMATIONS
-
     log("Read images from files ")
     const lowSVG = fs.readFileSync("./images/dynamicNft/frown.svg", { encoding: "utf8" })
     const highSVG = fs.readFileSync("./images/dynamicNft/happy.svg", { encoding: "utf8" })
@@ -37,7 +33,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         from: deployer,
         args: deployArgs,
         log: true,
-        waitConformations: waitBlockConfirmations,
+        waitConformations: network.config.blockConfirmations || 1,
     })
 
     /* Verify contract */

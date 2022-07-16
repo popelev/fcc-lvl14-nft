@@ -4,7 +4,7 @@ const { networkConfig, developmentChains } = require("../helper-hardhat-config")
 const { verify } = require("../utils/verify")
 const { storeImages, storeTokenUriMetadata } = require("../utils/uploadToPinata")
 
-const VRF_SUB_FUND_AMOUNT = ethers.utils.parseEther("100")
+const VRF_SUB_FUND_AMOUNT = ethers.utils.parseEther("0.01")
 const imagesLocation = "./images/randomNft"
 
 const UPLOAD_TO_PINATA = process.env.UPLOAD_TO_PINATA
@@ -55,12 +55,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         await vrgCoordinatorV2Mock.fundSubscription(subscriptionId, VRF_SUB_FUND_AMOUNT)
     } else {
         log("Read VRFCoordinatorV2Mock from mainnet or real testnet")
-        vrfCoordinatorAddress = await networkConfig[chainId]["VRFCoordinatorV2Mock"]
+        vrfCoordinatorAddress = await networkConfig[chainId]["ethUsdPriceFeed"]
         subscriptionId = networkConfig[chainId]["subscriptionId"]
     }
-    const waitBlockConfirmations = developmentChains.includes(network.name)
-        ? 1
-        : VERIFICATION_BLOCK_CONFIRMATIONS
 
     log("----------------------------------------------------")
     const deployArgs = [
@@ -71,7 +68,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         tokensUris,
         networkConfig[chainId]["mintFee"],
     ]
-    log("VRFCoordinatorV2Args " + deployArgs)
+    log("randomIpfs " + deployArgs)
 
     /* Deply contract */
     log("Deploy randomipfs contract")
@@ -79,14 +76,14 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         from: deployer,
         args: deployArgs,
         log: true,
-        waitConformations: waitBlockConfirmations,
+        waitConformations: network.config.blockConfirmations || 1,
     })
 
     /* Verify contract */
     log("Contract deployed!")
 
     if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
-        await verify(raffle.address, deployArgs)
+        await verify(randomIpfsNft.address, deployArgs)
     }
     log("----------------------------------------------------------")
 }
